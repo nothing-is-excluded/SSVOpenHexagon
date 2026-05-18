@@ -71,26 +71,24 @@ void HexagonGameStatus::resetTime()
 
 void HexagonGameStatus::accumulateFrametime(const double ft) noexcept
 {
-    // TODO (P2): double-check what to do with remainder
-
     totalFrametimeAccumulator += ft;
 
-    // double pauseRemainder = 0.0;
+    double remainingFrametime = ft;
+
     if(currentPause > 0.0)
     {
-        currentPause -= ft;
-        // if(currentPause < 0.0)
-        // {
-        //     pauseRemainder = -currentPause;
-        // }
+        const double pausedFrametime =
+            std::min(currentPause, remainingFrametime);
+
+        currentPause -= pausedFrametime;
+        remainingFrametime -= pausedFrametime;
+        pausedFrametimeAccumulator += pausedFrametime;
     }
 
-    // if(currentPause <= 0.0)
-    else
+    if(remainingFrametime > 0.0)
     {
-        playedFrametimeAccumulator += ft;
-        currentIncrementTime += ft;
-        // playedFrametimeAccumulator += pauseRemainder;
+        playedFrametimeAccumulator += remainingFrametime;
+        currentIncrementTime += remainingFrametime;
     }
 }
 
